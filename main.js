@@ -161,7 +161,7 @@
         // Added tabs for "File Mode" and "Folder Mode"
         panel.innerHTML = `
       <div class="panel-header">
-        <span>茶思屋 Markdown（含图片） 导入助手</span>
+        <span>茶思屋 Markdown（含图片） 发布助手</span>
         <span class="close-btn" id="md-import-close">&times;</span>
       </div>
       <div class="panel-tabs" style="display:flex;border-bottom:1px solid #e4e7ed;background:#f5f7fa;">

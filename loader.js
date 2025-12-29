@@ -1,6 +1,6 @@
 (function () {
     if (document.getElementById('chaspark-md-injector-loaded')) {
-        console.log("茶思屋 Markdown 导入助手已加载。");
+        console.log("茶思屋 Markdown 发布助手已加载。");
         // Optionally toggle the panel here if we had a global toggle function
         // But since main.js handles the panel creation, we can just re-inject or assume it's there.
         return;
@@ -26,5 +26,5 @@
     };
     (document.head || document.documentElement).appendChild(script);
 
-    console.log("茶思屋 Markdown 导入助手初始化完成。");
+    console.log("茶思屋 Markdown 发布助手初始化完成。");
 })();
