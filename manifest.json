@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "name": "茶思屋 Markdown 导入助手",
+    "version": "1.0",
+    "description": "自动导入 Markdown 并上传本地图片到 Chaspark 编辑器",
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://www.chaspark.com/*"
+    ],
+    "action": {
+        "default_title": "导入 Markdown"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "main.js",
+                "styles.css"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
