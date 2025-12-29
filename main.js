@@ -158,12 +158,15 @@
         const panel = document.createElement("div");
         panel.id = "chaspark-md-import-panel";
 
+        const isPublishPage = window.location.href.includes("/hotspots/publish");
+
         // Added tabs for "File Mode" and "Folder Mode"
         panel.innerHTML = `
       <div class="panel-header">
         <span>茶思屋 Markdown（含图片） 发布助手</span>
         <span class="close-btn" id="md-import-close">&times;</span>
       </div>
+      ${isPublishPage ? `
       <div class="panel-tabs" style="display:flex;border-bottom:1px solid #e4e7ed;background:#f5f7fa;">
         <div class="tab active" data-tab="file" style="flex:1;padding:8px;text-align:center;cursor:pointer;border-bottom:2px solid #409eff;color:#409eff;font-weight:500;">方式1：选择文件</div>
         <div class="tab" data-tab="folder" style="flex:1;padding:8px;text-align:center;cursor:pointer;color:#606266;">方式2：选择项目目录</div>
@@ -196,12 +199,29 @@
       <div class="panel-footer">
         <button id="md-import-run" class="btn btn-primary">开始上传并填充</button>
       </div>
+      ` : `
+      <div class="panel-content" style="padding: 20px; text-align: center;">
+        <p style="margin-bottom: 15px; color: #606266;">检测到您当前不在发布页面。</p>
+        <a href="https://www.chaspark.com/#/hotspots/publish" style="display: inline-block; padding: 10px 20px; background: #409eff; color: white; border-radius: 4px; text-decoration: none;">前往内容发布页面</a>
+        <div class="hint" style="margin-top: 15px;">提示：只有在发布窗口打开的情况下，插件才能自动填充内容。</div>
+      </div>
+      `}
     `;
 
         document.body.appendChild(panel);
 
         const closeBtn = panel.querySelector("#md-import-close");
+        if (!isPublishPage) {
+            closeBtn.onclick = () => {
+                panel.remove();
+                const marker = document.getElementById('chaspark-md-injector-loaded');
+                if (marker) marker.remove();
+            };
+            return;
+        }
+
         const statusEl = panel.querySelector("#md-import-status");
+
         const runBtn = panel.querySelector("#md-import-run");
 
         const mdFileInput = panel.querySelector("#md-file-input");
