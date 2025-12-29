@@ -1,2 +1,0 @@
-# cha_publish_extension
-黄大年茶思屋网站多图Markdown内容发布Chrome扩展插件
