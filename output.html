@@ -1,0 +1,65 @@
+<h1>非官方-茶思屋 Markdown 发布助手 (Chaspark Markdown Publisher)
+</h1>
+<a href="https://github.com/famotime/cha_publish_extension" target="_blank"><img src="https://img.shields.io/badge/version-1.0-blue.svg" alt="Version" style="max-width:100%;height:auto;margin:10px 0;"></a>
+<a href="https://www.google.com/chrome/" target="_blank"><img src="https://img.shields.io/badge/platform-Chrome%20|%20Edge-lightgrey.svg" alt="Platform" style="max-width:100%;height:auto;margin:10px 0;"></a>
+<p><strong>茶思屋 Markdown 发布助手</strong> 是一款专为 <a href="https://www.chaspark.com" target="_blank">黄大年茶思屋 (Chaspark)</a> 设计的浏览器扩展，旨在通过自动化流程简化包含多图片的 Markdown 内容的发布操作。</p>
+<hr>
+<h2>🔥 核心特性
+</h2>
+<ul>
+<li>🖼️ <strong>自动化上传图片</strong>：自动解析 Markdown 中的本地相对路径图片，一键上传至茶思屋图床并自动替换链接。</li>
+<li>📝 <strong>智能解析器</strong>：支持 Markdown 语法（标题、加粗、链接、引用、图片等）并转换为编辑器的原生产生内容。</li>
+<li>📂 <strong>双导入方案</strong>：</li>
+<ul>
+<li><strong>文件模式</strong>：选择单个 <code>.md</code> 文件及配套图片目录。</li>
+<li><strong>项目模式</strong>：选择Markdown文件和图片所在文件夹，插件自动识别文档及资源，实现“一键发布”。</li>
+</ul>
+<li>🛡️ <strong>隐私安全</strong>：所有操作均在本地浏览器内完成，不采集任何个人数据。</li>
+</ul>
+<hr>
+<h2>🛠️ 安装指南
+</h2>
+<ol>
+<li><strong>下载源码</strong>：将本项目文件夹下载/克隆到本地。</li>
+<li><strong>加载扩展程序</strong>：</li>
+<ul>
+<li>打开 Chrome/Edge 浏览器，输入 <code>chrome://extensions/</code> 进入扩展管理页面。</li>
+<li>勾选右上角的 <strong>「开发者模式」</strong>。</li>
+<li>点击 <strong>「加载已解压的扩展程序」</strong>，选择本项目文件夹。</li>
+</ul>
+<li><strong>固定至工具栏（建议）</strong>：点击浏览器拼图图标 🧩，找到本插件并点击固定图标 📌。</li>
+</ol>
+<hr>
+<h2>📖 使用说明
+</h2>
+<h3>1. 环境准备
+</h3>
+<ul>
+<li>确保您已在浏览器中登录 <a href="https://www.chaspark.com" target="_blank">黄大年茶思屋网站</a>。</li>
+<li>建议将 Markdown 引用图片的路径设置为<strong>相对路径</strong>（如 <code><img src="assets/image.png" alt="" style="max-width:100%;height:auto;margin:10px 0;"></code>）。</li>
+</ul>
+<h3>2. 使用流程
+</h3>
+<ol>
+<li><strong>进入发布页</strong>：手工操作进入<a href="https://www.chaspark.com/#/hotspots/publish" target="_blank">黄大年茶思屋网站“学术热点”发布页面</a>，或者在该网站其他页面点击插件图标，会引导您进入发布页面。</li>
+<li><strong>导入内容</strong>（本项目 example_doc 目录下包含一个多图片 Markdown 示例文件，可供测试）：</li>
+<ul>
+<li><strong>方式 1</strong>：选择您的 Markdown 文件，以及选择图片所在的根目录。</li>
+<li><strong>方式 2</strong>：直接选择 Markdown 文件所在项目文件夹（适合该目录仅包含唯一 Markdown 文件且相关图片也包含在此目录下的情况）。</li>
+</ul>
+<li><strong>完成填充</strong>：点击 <strong>「开始上传并填充」</strong>，插件将执行自动化操作：</li>
+<ul>
+<li>提取并上传本地图片到官方 CDN。</li>
+<li>替换所有图片引用为最新的网络地址。</li>
+<li>将渲染后的 HTML 自动注入发布页面编辑器。</li>
+</ul>
+</ol>
+<img src="image.png" alt="image-20251229233258997" style="max-width:100%;height:auto;margin:10px 0;">
+<hr>
+<h2>🔒 隐私与许可
+</h2>
+<ul>
+<li><strong>非官方插件</strong>：目前黄大年茶思屋网站并未提供公开的内容发布 API 接口，本插件开发完全属于个人行为，旨在提高包含多图片的Markdown内容在网站的发布效率。相关行为若违反官方使用规范，本插件项目将下线处理。</li>
+<li><strong>隐私安全</strong>：所有操作均在本地浏览器内完成，不采集任何个人数据。但本插件并未上架Chrome / Edge 官方扩展商店，安装使用须浏览器打开“开发者模式”，有一定安全风险，请自行斟酌是否使用，自行承担风险。</li>
+<li><strong>项目许可</strong>：本项目基于 MIT 协议，欢迎二次开发与贡献。</li>
+</ul>

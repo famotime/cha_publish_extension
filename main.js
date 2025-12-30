@@ -104,12 +104,17 @@
         html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
         // Convert # headings
+        html = html.replace(/^##### ([^\n]+)$/gm, "<h5>$1</h5>");
+        html = html.replace(/^#### ([^\n]+)$/gm, "<h4>$1</h4>");
         html = html.replace(/^### ([^\n]+)$/gm, "<h3>$1</h3>");
         html = html.replace(/^## ([^\n]+)$/gm, "<h2>$1</h2>");
         html = html.replace(/^# ([^\n]+)$/gm, "<h1>$1</h1>");
 
         // Convert MD Images to HTML Imgs
         html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;height:auto;margin:10px 0;">');
+
+        // Convert inline code `text` to <code>
+        html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
 
         // Convert [link](url) to <a> (run after images to avoid matching ![alt](url))
         html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
@@ -119,12 +124,71 @@
         // Merge consecutive blockquotes
         html = html.replace(/<\/blockquote>\n<blockquote>/g, "<br>");
 
+        // Convert horizontal rules
+        html = html.replace(/^(?:---|\*\*\*|___)\s*$/gm, "<hr>");
+
+        // Normalize line endings for consistent processing
+        html = html.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+        // Convert lists (hierarchical approach)
+        const lines = html.split("\n");
+        const listStack = [];
+        const resultLines = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const listMatch = line.match(/^(\s*)([\*\-\+]|\d+\.) (.*)$/);
+
+            if (listMatch) {
+                const indent = listMatch[1].length;
+                const isOrdered = /^\d/.test(listMatch[2]);
+                const content = listMatch[3];
+                const listTag = isOrdered ? "ol" : "ul";
+
+                // Close stacks if current indent is less than previous
+                while (listStack.length > 0 && listStack[listStack.length - 1].indent > indent) {
+                    const last = listStack.pop();
+                    // Close sub-list only, parent li will be closed by the sibling
+                    resultLines.push(`</${last.tag}>`);
+                }
+
+                if (listStack.length === 0 || indent > listStack[listStack.length - 1].indent) {
+                    // Start a new sub-list
+                    listStack.push({ indent, tag: listTag });
+                    resultLines.push(`<${listTag}>`);
+                    resultLines.push(`<li>${content}</li>`);
+                } else if (indent === listStack[listStack.length - 1].indent) {
+                    // Check if list type changed at same level
+                    if (listTag !== listStack[listStack.length - 1].tag) {
+                        const last = listStack.pop();
+                        resultLines.push(`</${last.tag}>`);
+                        listStack.push({ indent, tag: listTag });
+                        resultLines.push(`<${listTag}>`);
+                    }
+                    resultLines.push(`<li>${content}</li>`);
+                }
+            } else {
+                // Not a list line, close all stacks
+                while (listStack.length > 0) {
+                    const last = listStack.pop();
+                    resultLines.push(`</${last.tag}>`);
+                }
+                resultLines.push(line);
+            }
+        }
+        // Final close
+        while (listStack.length > 0) {
+            const last = listStack.pop();
+            resultLines.push(`</${last.tag}>`);
+        }
+        html = resultLines.join("\n");
+
         // Convert line breaks to paragraphs
         const blocks = html.split(/\n\n+/);
         html = blocks.map(block => {
             block = block.trim();
             if (!block) return "";
-            if (block.match(/^<(h1|h2|h3|img|a|ul|ol|blockquote)/)) return block;
+            if (block.match(/^<(h1|h2|h3|h4|h5|img|a|ul|ol|blockquote|hr)/)) return block;
             return "<p>" + block.replace(/\n/g, "<br>") + "</p>";
         }).join("\n");
 
@@ -293,7 +357,8 @@
                     }
 
                     imgFiles = projectDirInput.files;
-                    statusEl.textContent = `找到文档: ${mdFile.name}`;
+                    const imgFileCount = Array.from(imgFiles).filter(f => /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.name)).length;
+                    statusEl.textContent = `找到文档: ${mdFile.name}，包含 ${imgFileCount} 张图片资源`;
                 }
 
                 // --- 通用逻辑 ---
