@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "茶思屋 Markdown 发布助手",
-    "version": "1.0",
+    "version": "1.5",
     "description": "自动导入 Markdown 并上传本地图片到 Chaspark 编辑器",
     "permissions": [
         "activeTab",

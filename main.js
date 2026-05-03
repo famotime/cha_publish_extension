@@ -1,8 +1,9 @@
 (() => {
+    // 2026-05-03 更新：旧端点 /chasiwu/media/v1/tinyimage/ 已废弃（返回 402），改用新端点
     const UPLOAD_URL = "https://www.chaspark.com/chasiwu/media/v1/media/image/upload";
 
     function getCsrfTokenFromCookie() {
-        const m = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const m = document.cookie.match(/X-CSRF-TOKEN=([^;]+)/) || document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         return m ? decodeURIComponent(m[1]) : "";
     }
 
@@ -46,8 +47,11 @@
             const xhr = new XMLHttpRequest();
             xhr.open("POST", UPLOAD_URL, true);
             xhr.withCredentials = true;
-            xhr.setRequestHeader("x-csrf-token", getCsrfTokenFromCookie());
+            xhr.setRequestHeader("X-CSRF-TOKEN", getCsrfTokenFromCookie());
             xhr.setRequestHeader("x-requested-with", "XMLHttpRequest");
+            xhr.setRequestHeader("X-File-Scene", "contentPublishTextImage");
+            xhr.setRequestHeader("Column-Type", "hotspots");
+            xhr.setRequestHeader("Accept", "application/json, text/plain, */*");
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState !== 4) return;
@@ -79,7 +83,7 @@
                 }
                 if (!url) {
                     console.error("No image URL in response:", data);
-                    reject(new Error("Image upload failed: no URL returned"));
+                    reject(new Error("Image upload failed: " + (data.message || JSON.stringify(data))));
                     return;
                 }
                 resolve(url);
