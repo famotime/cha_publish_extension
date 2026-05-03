@@ -2,6 +2,7 @@
     // 2026-05-03 更新：旧端点 /chasiwu/media/v1/tinyimage/ 已废弃（返回 402），改用新端点
     const UPLOAD_URL = "https://www.chaspark.com/chasiwu/media/v1/media/image/upload";
 
+
     function getCsrfTokenFromCookie() {
         const m = document.cookie.match(/X-CSRF-TOKEN=([^;]+)/) || document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         return m ? decodeURIComponent(m[1]) : "";
@@ -289,9 +290,7 @@
         }
 
         const statusEl = panel.querySelector("#md-import-status");
-
         const runBtn = panel.querySelector("#md-import-run");
-
         const mdFileInput = panel.querySelector("#md-file-input");
         const imgDirInput = panel.querySelector("#img-dir-input");
         const projectDirInput = panel.querySelector("#project-dir-input");
@@ -299,6 +298,7 @@
         const tabs = panel.querySelectorAll(".tab");
         let currentMode = "file";
 
+        // 标签页切换
         tabs.forEach(tab => {
             tab.onclick = () => {
                 tabs.forEach(t => {
@@ -321,20 +321,56 @@
             };
         });
 
+        // 关闭按钮
         closeBtn.onclick = () => {
             panel.remove();
             const marker = document.getElementById('chaspark-md-injector-loaded');
             if (marker) marker.remove();
         };
 
+        // 选择文件后静默更新状态栏，不弹窗
+        mdFileInput.onchange = () => {
+            if (mdFileInput.files[0]) {
+                statusEl.className = "status-box";
+                statusEl.textContent = `已选择文档: ${mdFileInput.files[0].name}`;
+            }
+        };
+
+        imgDirInput.onchange = () => {
+            if (imgDirInput.files.length > 0) {
+                const imgCount = Array.from(imgDirInput.files).filter(f => /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.name)).length;
+                statusEl.className = "status-box";
+                statusEl.textContent = `已选择图片目录，包含 ${imgCount} 张图片`;
+            }
+        };
+
+        projectDirInput.onchange = () => {
+            if (projectDirInput.files.length > 0) {
+                // 查找目录中的 markdown 文件
+                let foundMd = null;
+                for (const f of projectDirInput.files) {
+                    if (f.name.endsWith(".md") || f.name.endsWith(".markdown")) {
+                        foundMd = f;
+                        break;
+                    }
+                }
+                const imgCount = Array.from(projectDirInput.files).filter(f => /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.name)).length;
+                statusEl.className = "status-box";
+                if (foundMd) {
+                    statusEl.textContent = `已选择目录 — 文档: ${foundMd.name}，${imgCount} 张图片`;
+                } else {
+                    statusEl.className = "status-box error";
+                    statusEl.textContent = `已选择目录，但未找到 Markdown 文件（共 ${projectDirInput.files.length} 个文件）`;
+                }
+            }
+        };
+
+        // 点击"开始上传并填充"按钮
         runBtn.onclick = async () => {
-            statusEl.className = "status-box processing";
-            statusEl.textContent = "正在处理...";
-            runBtn.disabled = true;
+            // 预检查：收集文件信息
+            let mdFile, imgFiles = [];
 
             try {
-                let mdFile, imgFiles = [];
-
                 if (currentMode === "file") {
                     // 文件模式逻辑
                     if (!mdFileInput.files[0]) {
@@ -361,12 +397,19 @@
                     }
 
                     imgFiles = projectDirInput.files;
-                    const imgFileCount = Array.from(imgFiles).filter(f => /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.name)).length;
-                    statusEl.textContent = `找到文档: ${mdFile.name}，包含 ${imgFileCount} 张图片资源`;
                 }
+            } catch (e) {
+                statusEl.className = "status-box error";
+                statusEl.textContent = "错误: " + e.message;
+                return;
+            }
 
-                // --- 通用逻辑 ---
+            // ——— 预检查通过，直接开始上传 ———
+            statusEl.className = "status-box processing";
+            statusEl.textContent = "正在处理...";
+            runBtn.disabled = true;
 
+            try {
                 // 1. 读取 Markdown
                 let md = await readTextFile(mdFile);
                 const imgsInMd = parseImages(md);
@@ -377,9 +420,9 @@
                 const fileMap = new Map();
                 if (imgFiles && imgFiles.length > 0) {
                     for (const f of imgFiles) {
-                        const rel = (f.webkitRelativePath || f.name).replace(/^[\\/]+/, "");
+                        const rel = (f.webkitRelativePath || f.name).replace(/^[\\\/]+/, "");
                         fileMap.set(rel, f);
-                        const base = rel.split(/[\\/]/).pop();
+                        const base = rel.split(/[\\\/]/).pop();
                         if (!fileMap.has(base)) fileMap.set(base, f);
                     }
                 }
@@ -396,12 +439,12 @@
 
                     // 剥离查询参数 (如 ?t=123)
                     let cleanRelPath = img.relPath.split('?')[0];
-                    let rel = cleanRelPath.replace(/^\.?[\\/]/, "");
+                    let rel = cleanRelPath.replace(/^\.?[\\\/]/, "");
 
                     let file =
                         fileMap.get(rel) ||
                         fileMap.get(cleanRelPath) ||
-                        fileMap.get(rel.split(/[\\/]/).pop()) ||
+                        fileMap.get(rel.split(/[\\\/]/).pop()) ||
                         fileMap.get(img.relPath); // 最后的保底
 
                     if (!file && currentMode === "folder") {
